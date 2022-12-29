@@ -21,13 +21,13 @@ fn main() {
         // - If arg is anything else, then call the count() function, passing "arg" to it.
 
         if arg == "sum"{
-            sum()
+            sum();
         }
         else if arg == "double"{
-            double()
+            double();
         }
         else{
-            count(arg)
+            count(arg);
         }
 
 
@@ -42,7 +42,8 @@ fn sum() {
     // and add them all together (increment the `sum` variable).  Hint: You should get 255
     // Run it with `cargo run sum`
 
-    for elem in 7..24{
+    //or write 7..24 not inclusive
+    for elem in 7..=23{
         sum = sum + elem;
     }
 
