@@ -4,6 +4,9 @@ use std::io;
 use crossterm::{terminal, ExecutableCommand};
 use crossterm::terminal::{EnterAlternateScreen, LeaveAlternateScreen};
 use crossterm::cursor::{Hide, Show};
+use crossterm::{event::{self, Event, KeyCode}};
+use std::time::Duration;
+
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut audio = Audio::new();
@@ -21,6 +24,22 @@ fn main() -> Result<(), Box<dyn Error>> {
     terminal::enable_raw_mode()?;
     stdout.execute(EnterAlternateScreen)?;
     stdout.execute(Hide)?;
+
+    //main loop
+    'gameloop: loop {
+        //input event
+        while event::poll(Duration::default())? {
+            if let Event::Key(key_event) = event::read()?{
+                match key_event.code {
+                    KeyCode::Esc | KeyCode::Char('q') => {
+                        audio.play("lose");
+                        break 'gameloop;
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
 
     //clean up
     audio.wait();
