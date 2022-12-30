@@ -10,7 +10,8 @@ use std::time::{Duration, Instant};
 
 use invaders::{
     frame::{self, new_frame, Drawable, Frame},
-    render
+    render,
+    player::Player
 };
 
 
@@ -50,14 +51,22 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     });
 
+    let mut player = Player::new();
+
     // Game loop
     'gameloop: loop {
         // Per frame init 
-        let curr_frame = new_frame();
+        let mut curr_frame = new_frame();
         //input event
         while event::poll(Duration::default())? {
             if let Event::Key(key_event) = event::read()?{
                 match key_event.code {
+                    KeyCode::Char('a') | KeyCode::Left => {
+                        player.move_left();
+                    }
+                    KeyCode::Char('d') | KeyCode::Right => {
+                        player.move_right();
+                    }
                     KeyCode::Esc | KeyCode::Char('q') => {
                         audio.play("lose");
                         break 'gameloop;
@@ -66,6 +75,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
+
+        player.draw(&mut curr_frame);
 
         //Draw & render
         let _ = render_tx.send(curr_frame);
