@@ -52,10 +52,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     });
 
     let mut player = Player::new();
+    let mut instant = Instant::now();
 
     // Game loop
     'gameloop: loop {
-        // Per frame init 
+        // Per frame init
+        let delta = instant.elapsed();
+        instant = Instant::now(); 
         let mut curr_frame = new_frame();
         //input event
         while event::poll(Duration::default())? {
@@ -67,6 +70,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                     KeyCode::Char('d') | KeyCode::Right => {
                         player.move_right();
                     }
+                    KeyCode::Char(' ') | KeyCode::Enter =>{
+                        if player.shoot(){
+                            audio.play("pew");
+                        }
+                    }
                     KeyCode::Esc | KeyCode::Char('q') => {
                         audio.play("lose");
                         break 'gameloop;
@@ -76,9 +84,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
 
-        player.draw(&mut curr_frame);
+        player.update(delta);
 
         //Draw & render
+        player.draw(&mut curr_frame);
         let _ = render_tx.send(curr_frame);
         thread::sleep(Duration::from_millis(1));
     }
